@@ -2,6 +2,57 @@ const Student = require('../models/Student');
 const Teacher = require('../models/Teacher');
 const { createUserInAuth } = require('../services/authApiClient');
 
+// PROFILE ENDPOINTS
+exports.getStudentProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const student = await Student.findOne({ userId });
+    
+    if (!student) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Profil étudiant non trouvé'
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: student
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Erreur lors de la récupération du profil',
+      error: error.message
+    });
+  }
+};
+
+exports.getTeacherProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const teacher = await Teacher.findOne({ userId });
+    
+    if (!teacher) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Profil enseignant non trouvé'
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      data: teacher
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Erreur lors de la récupération du profil',
+      error: error.message
+    });
+  }
+};
+
 // CRUD STUDENTS
 exports.getAllStudents = async (req, res) => {
   try {

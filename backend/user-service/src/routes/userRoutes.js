@@ -9,7 +9,9 @@ const {
   getTeacher,
   createTeacher,
   updateTeacher,
-  deleteTeacher
+  deleteTeacher,
+  getStudentProfile,
+  getTeacherProfile
 } = require('../controllers/userController');
 const { protect, restrictTo } = require('../middleware/authMiddleware');
 
@@ -17,6 +19,10 @@ const router = express.Router();
 
 // Toutes les routes protégées
 router.use(protect);
+
+// PROFILE ROUTES (user's own profile)
+router.get('/students/profile', restrictTo('student'), getStudentProfile);
+router.get('/teachers/profile', restrictTo('teacher'), getTeacherProfile);
 
 //  ROUTES STUDENTS
 router.get('/students', restrictTo('admin', 'teacher'), getAllStudents);
