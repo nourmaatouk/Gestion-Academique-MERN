@@ -59,7 +59,10 @@ app.post('/api/auth/register', (req, res) => forwardRequest(req, res, services.a
 app.post('/api/auth/login', (req, res) => forwardRequest(req, res, services.auth));
 app.get('/api/auth/verify', (req, res) => forwardRequest(req, res, services.auth));
 
-// USERS
+// USERS - Profile routes MUST come before :id routes
+app.get('/api/users/students/profile', (req, res) => forwardRequest(req, res, services.users));
+app.get('/api/users/teachers/profile', (req, res) => forwardRequest(req, res, services.users));
+
 app.get('/api/users/students', (req, res) => forwardRequest(req, res, services.users));
 app.post('/api/users/students', (req, res) => forwardRequest(req, res, services.users));
 app.get('/api/users/students/:id', (req, res) => forwardRequest(req, res, services.users));
@@ -81,14 +84,21 @@ app.delete('/api/courses/courses/:id', (req, res) => forwardRequest(req, res, se
 
 app.get('/api/courses/departments', (req, res) => forwardRequest(req, res, services.courses));
 app.post('/api/courses/departments', (req, res) => forwardRequest(req, res, services.courses));
+app.patch('/api/courses/departments/:id', (req, res) => forwardRequest(req, res, services.courses));
+app.delete('/api/courses/departments/:id', (req, res) => forwardRequest(req, res, services.courses));
 
+app.get('/api/courses/enrollments', (req, res) => forwardRequest(req, res, services.courses));
 app.post('/api/courses/enrollments', (req, res) => forwardRequest(req, res, services.courses));
 app.get('/api/courses/enrollments/student/:studentId', (req, res) => forwardRequest(req, res, services.courses));
 app.get('/api/courses/enrollments/course/:courseId', (req, res) => forwardRequest(req, res, services.courses));
-app.patch('/api/courses/enrollments/:enrollmentId', (req, res) => forwardRequest(req, res, services.courses)); // ✅ AJOUTÉ
+app.patch('/api/courses/enrollments/:enrollmentId', (req, res) => forwardRequest(req, res, services.courses));
+app.delete('/api/courses/enrollments/:enrollmentId', (req, res) => forwardRequest(req, res, services.courses));
 
-app.post('/api/courses/assignments', (req, res) => forwardRequest(req, res, services.courses)); // ✅ AJOUTÉ
-app.get('/api/courses/assignments/teacher/:teacherId', (req, res) => forwardRequest(req, res, services.courses)); // ✅ AJOUTÉ
+app.get('/api/courses/assignments', (req, res) => forwardRequest(req, res, services.courses));
+app.post('/api/courses/assignments', (req, res) => forwardRequest(req, res, services.courses));
+app.get('/api/courses/assignments/teacher/:teacherId', (req, res) => forwardRequest(req, res, services.courses));
+app.patch('/api/courses/assignments/:id', (req, res) => forwardRequest(req, res, services.courses));
+app.delete('/api/courses/assignments/:id', (req, res) => forwardRequest(req, res, services.courses));
 
 // GRADES
 app.patch('/api/grades/update', (req, res) => forwardRequest(req, res, services.grades));

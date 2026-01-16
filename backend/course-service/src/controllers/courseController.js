@@ -181,10 +181,81 @@ exports.createDepartment = async (req, res) => {
   }
 };
 
+exports.updateDepartment = async (req, res) => {
+  try {
+    const department = await Department.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!department) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Département non trouvé'
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Département modifié avec succès',
+      data: { department }
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Erreur lors de la modification du département',
+      error: error.message
+    });
+  }
+};
+
+exports.deleteDepartment = async (req, res) => {
+  try {
+    const department = await Department.findByIdAndDelete(req.params.id);
+
+    if (!department) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Département non trouvé'
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Département supprimé avec succès'
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Erreur lors de la suppression du département',
+      error: error.message
+    });
+  }
+};
+
 // 📝 CRUD ENROLLMENTS
+exports.getAllEnrollments = async (req, res) => {
+  try {
+    const enrollments = await Enrollment.find();
+    
+    res.status(200).json({
+      status: 'success',
+      results: enrollments.length,
+      data: { enrollments }
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Erreur lors de la récupération des inscriptions',
+      error: error.message
+    });
+  }
+};
+
 exports.createEnrollment = async (req, res) => {
   try {
-    const { enrollmentId, studentId, courseId, semester } = req.body;
+    const { studentId, courseId, semester } = req.body;
 
     // Vérifier si le cours existe
     const course = await Course.findOne({ courseId });
@@ -194,6 +265,9 @@ exports.createEnrollment = async (req, res) => {
         message: 'Cours non trouvé'
       });
     }
+
+    // Auto-generate enrollmentId if not provided
+    const enrollmentId = req.body.enrollmentId || `ENR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     const newEnrollment = await Enrollment.create({
       enrollmentId,
@@ -225,6 +299,12 @@ exports.createEnrollment = async (req, res) => {
 exports.getEnrollmentsByStudent = async (req, res) => {
   try {
     const { studentId } = req.params;
+    const { role } = req.user;
+    
+    // Students can only view their own enrollments
+    // Note: For students, we trust the frontend sends the correct studentId
+    // as it's retrieved from their profile. Additional verification could be
+    // added by checking against the user-service if needed.
     
     const enrollments = await Enrollment.find({ studentId })
       .populate('courseId', 'name credits');
@@ -266,7 +346,7 @@ exports.getEnrollmentsByCourse = async (req, res) => {
 // 👨‍🏫 CRUD COURSE ASSIGNMENTS
 exports.assignTeacherToCourse = async (req, res) => {
   try {
-    const { assignmentId, teacherId, courseId, semester } = req.body;
+    const { teacherId, courseId, semester } = req.body;
 
     // Vérifier si le cours existe
     const course = await Course.findOne({ courseId });
@@ -276,6 +356,9 @@ exports.assignTeacherToCourse = async (req, res) => {
         message: 'Cours non trouvé'
       });
     }
+
+    // Auto-generate assignmentId if not provided
+    const assignmentId = req.body.assignmentId || `ASN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     const newAssignment = await CourseAssignment.create({
       assignmentId,
@@ -310,14 +393,10 @@ exports.getCoursesByTeacher = async (req, res) => {
     
     const assignments = await CourseAssignment.find({ teacherId });
 
-    // Récupérer les détails des cours
-    const courseIds = assignments.map(a => a.courseId);
-    const courses = await Course.find({ courseId: { $in: courseIds } });
-
     res.status(200).json({
       status: 'success',
-      results: courses.length,
-      data: { courses }
+      results: assignments.length,
+      data: { assignments }
     });
   } catch (error) {
     res.status(500).json({
@@ -328,7 +407,6 @@ exports.getCoursesByTeacher = async (req, res) => {
   }
 };
 
-// ✅ AJOUTER: Mettre à jour un enrollment (pour les notes)
 exports.updateEnrollment = async (req, res) => {
   try {
     const enrollment = await Enrollment.findOneAndUpdate(
@@ -353,6 +431,102 @@ exports.updateEnrollment = async (req, res) => {
     res.status(500).json({
       status: 'error',
       message: 'Erreur lors de la mise à jour de l\'inscription',
+      error: error.message
+    });
+  }
+};
+
+exports.deleteEnrollment = async (req, res) => {
+  try {
+    const enrollment = await Enrollment.findOneAndDelete({ enrollmentId: req.params.enrollmentId });
+
+    if (!enrollment) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Inscription non trouvée'
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Inscription supprimée avec succès'
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Erreur lors de la suppression de l\'inscription',
+      error: error.message
+    });
+  }
+};
+
+// 👨‍🏫 CRUD COURSE ASSIGNMENTS
+exports.getAllAssignments = async (req, res) => {
+  try {
+    const assignments = await CourseAssignment.find();
+    
+    res.status(200).json({
+      status: 'success',
+      results: assignments.length,
+      data: { assignments }
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Erreur lors de la récupération des assignations',
+      error: error.message
+    });
+  }
+};
+
+exports.updateAssignment = async (req, res) => {
+  try {
+    const assignment = await CourseAssignment.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!assignment) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Assignation non trouvée'
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Assignation mise à jour avec succès',
+      data: { assignment }
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Erreur lors de la mise à jour de l\'assignation',
+      error: error.message
+    });
+  }
+};
+
+exports.deleteAssignment = async (req, res) => {
+  try {
+    const assignment = await CourseAssignment.findByIdAndDelete(req.params.id);
+
+    if (!assignment) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Assignation non trouvée'
+      });
+    }
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Assignation supprimée avec succès'
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Erreur lors de la suppression de l\'assignation',
       error: error.message
     });
   }

@@ -1,0 +1,17 @@
+{
+  "name": "gestion-academique-backend",
+  "version": "1.0.0",
+  "scripts": {
+    "install-all": "npm run install-services",
+    "install-services": "for /d %s in (*-*) do (cd %s && npm install && cd ..)",
+    "dev": "concurrently \"cd api-gateway && npm run dev\" \"cd auth-service && npm run dev\" \"cd user-service && npm run dev\" \"cd course-service && npm run dev\" \"cd grade-service && npm run dev\"",
+    "start": "concurrently \"cd api-gateway && npm start\" \"cd auth-service && npm start\" \"cd user-service && npm start\" \"cd course-service && npm start\" \"cd grade-service && npm start\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "mongoose": "^9.1.1"
+  }
+}
