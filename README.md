@@ -17,18 +17,16 @@ graph TD
     Grade[Grade Service (3004)]
     DB[(MongoDB)]
 
-    Client -->|HTTP /api| Gateway
-    Gateway -->|/api/auth| Auth
-    Gateway -->|/api/users| User
-    Gateway -->|/api/courses| Course
-    Gateway -->|/api/grades| Grade
+    Client -->|HTTP API| Gateway
+    Gateway -->|Auth API| Auth
+    Gateway -->|User API| User
+    Gateway -->|Course API| Course
+    Gateway -->|Grade API| Grade
 
     Auth --> DB
     User --> DB
     Course --> DB
     Grade --> DB
-```
-
 ### Structure du Projet
 
 ```
