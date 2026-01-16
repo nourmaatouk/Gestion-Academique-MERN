@@ -7,29 +7,6 @@ Ce projet permet la gestion des étudiants, enseignants, cours, notes et départ
 
 ### Diagramme de Microservices
 
-```mermaid
-graph TD
-    Client[Client (Frontend - React/Vite)]
-    Gateway[API Gateway (3000)]
-    Auth[Auth Service (3001)]
-    User[User Service (3002)]
-    Course[Course Service (3003)]
-    Grade[Grade Service (3004)]
-    DB[(MongoDB)]
-
-    Client -->|HTTP API| Gateway
-    Gateway -->|Auth API| Auth
-    Gateway -->|User API| User
-    Gateway -->|Course API| Course
-    Gateway -->|Grade API| Grade
-
-    Auth --> DB
-    User --> DB
-    Course --> DB
-    Grade --> DB
-### Structure du Projet
-
-```
 gestion-academique-mern/
 ├── backend/                  # Services Backend
 │   ├── api-gateway/          # Point d'entrée (Port 3000)
